@@ -17,7 +17,7 @@ source path/to/venv/bin/activate
 python3 -m pip install -r requirements.txt
 ```
 
-## Run
+## Run - Export Service Limit
 
 ```bash
 python3 export_service_limits.py \
@@ -36,7 +36,6 @@ python3 export_service_limits.py \
 ```
 
 
-
 ## Output
 
 The main CSV has these columns:
@@ -46,3 +45,30 @@ region,service_name,service_description,limit_name,scope_type,availability_domai
 ```
 
 OCI does not support usage and availability for every limit. Such rows remain in the main CSV with blank `usage` and `available` fields; their details are recorded in a companion `*_warnings.csv` file.
+
+
+
+## OCI Service Limit CSV Compare Tool
+
+Compares two OCI service-limit CSV exports and creates a diff CSV containing only matching limits whose `current_limit` differs.
+
+The script matches a limit by:
+
+- `service_name`
+- `limit_name`
+- `scope_type`
+- `availability_domain`
+
+This is more precise than using `service_name` alone because each service can have many independent limits.
+
+## Run
+
+```bash
+python3 compare_service_limit.py \
+  /path/to/source_service_limits.csv \
+  /path/to/target_service_limits.csv \
+  --output service_limit_current_limit_diff.csv
+```
+
+The output includes each affected service and limit alongside its current limit in the source and target regions.
+
